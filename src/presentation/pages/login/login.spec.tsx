@@ -1,20 +1,33 @@
 import React from 'react'
-import { render, RenderResult } from '@testing-library/react'
+import { cleanup, fireEvent, render, RenderResult } from '@testing-library/react'
 import Login from './login'
+import { Validation } from '@/presentation/protocols/validation'
+
+class ValidationSpy implements Validation {
+  errorMessage: string
+  input: object
+  validate (input: object): string {
+    this.input = input
+    return this.errorMessage
+  }
+}
 
 type SutTypes = {
   sut: RenderResult
+  validationSpy: ValidationSpy
 }
 
 const makeSut = (): SutTypes => {
-  const sut = render(<Login />)
-
+  const validationSpy = new ValidationSpy()
+  const sut = render(<Login validation={validationSpy}/>)
   return {
-    sut
+    sut,
+    validationSpy
   }
 }
 
 describe('Login components', () => {
+  afterEach(cleanup)
   test('Shold start with initial state of the inputs', () => {
     const { sut } = makeSut()
 
@@ -39,5 +52,23 @@ describe('Login components', () => {
     const errorWrap = sut.getByTestId('error-wrap')
 
     expect(errorWrap.childElementCount).toBe(0)
+  })
+
+  test('Shold call Validation with correct value of the email input', () => {
+    const { sut, validationSpy } = makeSut()
+    const input = sut.getByTestId('email')
+    fireEvent.input(input, { target: { value: 'any_email' } })
+    expect(validationSpy.input).toEqual({
+      email: 'any_email'
+    })
+  })
+
+  test('Shold call Validation with correct value of the password input', () => {
+    const { sut, validationSpy } = makeSut()
+    const input = sut.getByTestId('password')
+    fireEvent.input(input, { target: { value: 'any_password' } })
+    expect(validationSpy.input).toEqual({
+      password: 'any_password'
+    })
   })
 })
