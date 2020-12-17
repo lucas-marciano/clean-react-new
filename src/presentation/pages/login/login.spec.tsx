@@ -6,35 +6,38 @@ import { ValidationStub } from '@/presentation/test'
 
 type SutTypes = {
   sut: RenderResult
-  validationStub: ValidationStub
 }
 
-const makeSut = (): SutTypes => {
+type SutParam = {
+  validationError: string
+}
+
+const makeSut = (params?: SutParam): SutTypes => {
   const validationStub = new ValidationStub()
-  validationStub.errorMessage = faker.random.words()
+  validationStub.errorMessage = params?.validationError
   const sut = render(<Login validation={validationStub}/>)
   return {
-    sut,
-    validationStub
+    sut
   }
 }
 
 describe('Login components', () => {
   afterEach(cleanup)
   test('Shold start with initial state of the inputs', () => {
-    const { sut, validationStub } = makeSut()
-
+    const validationError = faker.random.words()
+    const { sut } = makeSut({ validationError })
     const emailStatus = sut.getByTestId('email-status')
-    expect(emailStatus.title).toBe(validationStub.errorMessage)
+    expect(emailStatus.title).toBe(validationError)
     expect(emailStatus.textContent).toBe('🔴')
 
     const passwordStatus = sut.getByTestId('password-status')
-    expect(passwordStatus.title).toBe(validationStub.errorMessage)
+    expect(passwordStatus.title).toBe(validationError)
     expect(passwordStatus.textContent).toBe('🔴')
   })
 
   test('Shold start with initial state of the button', () => {
-    const { sut } = makeSut()
+    const validationError = faker.random.words()
+    const { sut } = makeSut({ validationError })
     const submit = sut.getByTestId('submit') as HTMLButtonElement
 
     expect(submit.disabled).toBe(true)
@@ -48,26 +51,27 @@ describe('Login components', () => {
   })
 
   test('Shold show message of error when a email input filled wrong', () => {
-    const { sut, validationStub } = makeSut()
+    const validationError = faker.random.words()
+    const { sut } = makeSut({ validationError })
     const input = sut.getByTestId('email')
     fireEvent.input(input, { target: { value: faker.internet.email() } })
     const status = sut.getByTestId('email-status')
-    expect(status.title).toBe(validationStub.errorMessage)
+    expect(status.title).toBe(validationError)
     expect(status.textContent).toBe('🔴')
   })
 
   test('Shold show message of error when a password input filled wrong', () => {
-    const { sut, validationStub } = makeSut()
+    const validationError = faker.random.words()
+    const { sut } = makeSut({ validationError })
     const input = sut.getByTestId('password')
     fireEvent.input(input, { target: { value: faker.internet.password() } })
     const status = sut.getByTestId('password-status')
-    expect(status.title).toBe(validationStub.errorMessage)
+    expect(status.title).toBe(validationError)
     expect(status.textContent).toBe('🔴')
   })
 
   test('Shold show valid email state when Validation has succeeds', () => {
-    const { sut, validationStub } = makeSut()
-    validationStub.errorMessage = null
+    const { sut } = makeSut()
     const input = sut.getByTestId('email')
     fireEvent.input(input, { target: { value: faker.internet.email() } })
     const status = sut.getByTestId('email-status')
@@ -76,8 +80,7 @@ describe('Login components', () => {
   })
 
   test('Shold show valid password state when Validation has succeeds', () => {
-    const { sut, validationStub } = makeSut()
-    validationStub.errorMessage = null
+    const { sut } = makeSut()
     const input = sut.getByTestId('password')
     fireEvent.input(input, { target: { value: faker.internet.password() } })
     const status = sut.getByTestId('password-status')
@@ -86,8 +89,7 @@ describe('Login components', () => {
   })
 
   test('Shold enable submit button if form is valid', () => {
-    const { sut, validationStub } = makeSut()
-    validationStub.errorMessage = null
+    const { sut } = makeSut()
     const emailInput = sut.getByTestId('email')
     fireEvent.input(emailInput, { target: { value: faker.internet.email() } })
     const passwordInput = sut.getByTestId('password')
