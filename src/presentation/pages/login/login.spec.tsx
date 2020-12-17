@@ -11,6 +11,7 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const validationSpy = new ValidationSpy()
+  validationSpy.errorMessage = faker.random.words()
   const sut = render(<Login validation={validationSpy}/>)
   return {
     sut,
@@ -21,10 +22,10 @@ const makeSut = (): SutTypes => {
 describe('Login components', () => {
   afterEach(cleanup)
   test('Shold start with initial state of the inputs', () => {
-    const { sut } = makeSut()
+    const { sut, validationSpy } = makeSut()
 
     const emailStatus = sut.getByTestId('email-status') as HTMLButtonElement
-    expect(emailStatus.title).toBe('Campo obrigatório')
+    expect(emailStatus.title).toBe(validationSpy.errorMessage)
     expect(emailStatus.textContent).toBe('🔴')
 
     const passwordStatus = sut.getByTestId('password-status') as HTMLButtonElement
@@ -62,5 +63,14 @@ describe('Login components', () => {
     fireEvent.input(input, { target: { value: mockPassword } })
     expect(validationSpy.filedName).toBe('password')
     expect(validationSpy.fieldValue).toBe(mockPassword)
+  })
+
+  test('Shold show message of error when a email input filled wrong', () => {
+    const { sut, validationSpy } = makeSut()
+    const input = sut.getByTestId('email')
+    fireEvent.input(input, { target: { value: faker.internet.email() } })
+    const status = sut.getByTestId('email-status')
+    expect(status.title).toBe(validationSpy.errorMessage)
+    expect(status.textContent).toBe('🔴')
   })
 })
