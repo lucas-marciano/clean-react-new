@@ -5,9 +5,11 @@ import { Validation } from '@/presentation/protocols/validation'
 
 class ValidationSpy implements Validation {
   errorMessage: string
-  input: object
-  validate (input: object): string {
-    this.input = input
+  filedName: string
+  fieldValue: string
+  validate (filedName: string, fieldValue: string): string {
+    this.filedName = filedName
+    this.fieldValue = fieldValue
     return this.errorMessage
   }
 }
@@ -58,17 +60,15 @@ describe('Login components', () => {
     const { sut, validationSpy } = makeSut()
     const input = sut.getByTestId('email')
     fireEvent.input(input, { target: { value: 'any_email' } })
-    expect(validationSpy.input).toEqual({
-      email: 'any_email'
-    })
+    expect(validationSpy.filedName).toBe('email')
+    expect(validationSpy.fieldValue).toBe('any_email')
   })
 
   test('Shold call Validation with correct value of the password input', () => {
     const { sut, validationSpy } = makeSut()
     const input = sut.getByTestId('password')
     fireEvent.input(input, { target: { value: 'any_password' } })
-    expect(validationSpy.input).toEqual({
-      password: 'any_password'
-    })
+    expect(validationSpy.filedName).toBe('password')
+    expect(validationSpy.fieldValue).toBe('any_password')
   })
 })
