@@ -64,4 +64,24 @@ describe('Login components', () => {
     expect(status.title).toBe(validationStub.errorMessage)
     expect(status.textContent).toBe('🔴')
   })
+
+  test('Shold show valid email state when Validation has succeeds', () => {
+    const { sut, validationStub } = makeSut()
+    validationStub.errorMessage = null
+    const input = sut.getByTestId('email')
+    fireEvent.input(input, { target: { value: faker.internet.email() } })
+    const status = sut.getByTestId('email-status')
+    expect(status.title).toBe('Tudo certo!')
+    expect(status.textContent).toBe('🔵')
+  })
+
+  test('Shold show valid password state when Validation has succeeds', () => {
+    const { sut, validationStub } = makeSut()
+    validationStub.errorMessage = null
+    const input = sut.getByTestId('password')
+    fireEvent.input(input, { target: { value: faker.internet.password() } })
+    const status = sut.getByTestId('password-status')
+    expect(status.title).toBe('Tudo certo!')
+    expect(status.textContent).toBe('🔵')
+  })
 })
