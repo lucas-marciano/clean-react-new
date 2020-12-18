@@ -44,17 +44,38 @@ const populatePasswordField = (sut: RenderResult, password = faker.internet.pass
   fireEvent.input(input, { target: { value: password } })
 }
 
-const simulateValidSubmit = (sut: RenderResult, email = faker.internet.email(), password = faker.internet.password()): void => {
+const simulateValidSubmit = async (sut: RenderResult, email = faker.internet.email(), password = faker.internet.password()): Promise<void> => {
   populateEmailField(sut, email)
   populatePasswordField(sut, password)
-  const submit = sut.getByTestId('submit')
-  fireEvent.click(submit)
+  const form = sut.getByTestId('login-form')
+  fireEvent.submit(form)
+  await waitFor(() => form)
 }
 
-const simulateStatusInput = (sut: RenderResult, id: string, messageError?: string): void => {
+const testStatusInput = (sut: RenderResult, id: string, messageError?: string): void => {
   const status = sut.getByTestId(id)
   expect(status.title).toBe(messageError || 'Tudo certo!')
   expect(status.textContent).toBe(messageError ? '🔴' : '🔵')
+}
+
+const testErrorWrapChildCount = (sut: RenderResult, count: number): void => {
+  const errorWrap = sut.getByTestId('error-wrap')
+  expect(errorWrap.childElementCount).toBe(count)
+}
+
+const testElementExists = (sut: RenderResult, idTest: string): void => {
+  const item = sut.getByTestId(idTest)
+  expect(item).toBeTruthy()
+}
+
+const testContentIsEqual = (sut: RenderResult, fieldName: string, content: string): void => {
+  const el = sut.getByTestId(fieldName)
+  expect(el.textContent).toBe(content)
+}
+
+const testButtonIsDisabled = (sut: RenderResult, fieldName: string, isDisabled = true): void => {
+  const button = sut.getByTestId(fieldName) as HTMLButtonElement
+  expect(button.disabled).toBe(isDisabled)
 }
 
 describe('Login components', () => {
@@ -68,80 +89,72 @@ describe('Login components', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
 
-    simulateStatusInput(sut, 'email-status', validationError)
-    simulateStatusInput(sut, 'password-status', validationError)
+    testStatusInput(sut, 'email-status', validationError)
+    testStatusInput(sut, 'password-status', validationError)
   })
 
   test('Shold start with initial state of the button', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
-    const submit = sut.getByTestId('submit') as HTMLButtonElement
-
-    expect(submit.disabled).toBe(true)
+    testButtonIsDisabled(sut, 'submit')
   })
 
   test('Shold not render the loading and error message when initialize the view', () => {
     const { sut } = makeSut()
-    const errorWrap = sut.getByTestId('error-wrap')
-    expect(errorWrap.childElementCount).toBe(0)
+    testErrorWrapChildCount(sut, 0)
   })
 
   test('Shold show message of error when a email input filled wrong', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
     populateEmailField(sut)
-    simulateStatusInput(sut, 'email-status', validationError)
+    testStatusInput(sut, 'email-status', validationError)
   })
 
   test('Shold show message of error when a password input filled wrong', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
     populatePasswordField(sut)
-    simulateStatusInput(sut, 'password-status', validationError)
+    testStatusInput(sut, 'password-status', validationError)
   })
 
   test('Shold show valid email state when Validation has succeeds', () => {
     const { sut } = makeSut()
     populateEmailField(sut)
-    simulateStatusInput(sut, 'email-status')
+    testStatusInput(sut, 'email-status')
   })
 
   test('Shold show valid password state when Validation has succeeds', () => {
     const { sut } = makeSut()
     populatePasswordField(sut)
-    simulateStatusInput(sut, 'password-status')
+    testStatusInput(sut, 'password-status')
   })
 
   test('Shold enable submit button if form is valid', () => {
     const { sut } = makeSut()
     populateEmailField(sut)
     populatePasswordField(sut)
-    const submit = sut.getByTestId('submit') as HTMLButtonElement
-    expect(submit.disabled).toBe(false)
+    testButtonIsDisabled(sut, 'submit', false)
   })
 
-  test('Shold show spinner on submit', () => {
+  test('Shold show spinner on submit', async () => {
     const { sut } = makeSut()
-    simulateValidSubmit(sut)
-    const spinner = sut.getByTestId('spinner')
-    expect(spinner).toBeTruthy()
+    await simulateValidSubmit(sut)
+    testElementExists(sut, 'spinner')
   })
 
-  test('Shold call Authrentication with correct values', () => {
+  test('Shold call Authrentication with correct values', async () => {
     const { sut, authenticationSpy } = makeSut()
     const email = faker.internet.email()
-    const pass = faker.internet.password()
-    simulateValidSubmit(sut, email, pass)
-    expect(authenticationSpy.params).toEqual({
-      email: email,
-      password: pass
-    })
+    const password = faker.internet.password()
+    await simulateValidSubmit(sut, email, password)
+    expect(authenticationSpy.params).toEqual({ email,password })
   })
 
-  test('Shold call Authrentication only once', () => {
+  test('Shold call Authrentication only once', async () => {
     const { sut, authenticationSpy } = makeSut()
-    simulateValidSubmit(sut)
-    simulateValidSubmit(sut)
+    await simulateValidSubmit(sut)
+    await simulateValidSubmit(sut)
     expect(authenticationSpy.callsCount).toBe(1)
   })
 
@@ -149,7 +162,6 @@ describe('Login components', () => {
     const validationError = faker.random.words()
     const { sut, authenticationSpy } = makeSut({ validationError })
     populateEmailField(sut)
-    fireEvent.submit(sut.getByTestId('login-form'))
     expect(authenticationSpy.callsCount).toBe(0)
   })
 
@@ -157,26 +169,22 @@ describe('Login components', () => {
     const { sut, authenticationSpy } = makeSut()
     const error = new InvalideCredentialError()
     jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
-    simulateValidSubmit(sut)
-    const errorWrap = sut.getByTestId('error-wrap')
-    await waitFor(() => errorWrap)
-    const mainError = sut.getByTestId('main-error')
-    expect(mainError.textContent).toBe(error.message)
-    expect(errorWrap.childElementCount).toBe(1)
+    await simulateValidSubmit(sut)
+    testContentIsEqual(sut, 'main-error', error.message)
+    testErrorWrapChildCount(sut, 1)
   })
 
   test('Shold add acessToken to localstorage on success', async () => {
     const { sut, authenticationSpy } = makeSut()
-    simulateValidSubmit(sut)
-    await waitFor(() => sut.getByTestId('login-form'))
+    await simulateValidSubmit(sut)
     expect(localStorage.setItem).toHaveBeenCalledWith('accessToken', authenticationSpy.account.accessToken)
     expect(history.length).toBe(1)
     expect(history.location.pathname).toBe('/')
   })
 
-  test('Shold go to signup page', () => {
+  test('Shold go to signup page', async () => {
     const { sut } = makeSut()
-    simulateValidSubmit(sut)
+    await simulateValidSubmit(sut)
     const signup = sut.getByTestId('signup')
     fireEvent.click(signup)
     expect(history.length).toBe(2)
