@@ -1,8 +1,9 @@
 import React from 'react'
 import faker from 'faker'
-import { cleanup, fireEvent, render, RenderResult } from '@testing-library/react'
-import Login from './login'
+import { cleanup, fireEvent, render, RenderResult, waitFor } from '@testing-library/react'
 import { ValidationStub, AuthenticationSpy } from '@/presentation/test'
+import { InvalideCredentialError } from '@/domain/errors'
+import Login from './login'
 
 type SutTypes = {
   sut: RenderResult
@@ -68,7 +69,6 @@ describe('Login components', () => {
   test('Shold not render the loading and error message when initialize the view', () => {
     const { sut } = makeSut()
     const errorWrap = sut.getByTestId('error-wrap')
-
     expect(errorWrap.childElementCount).toBe(0)
   })
 
@@ -137,5 +137,17 @@ describe('Login components', () => {
     populateEmailField(sut)
     fireEvent.submit(sut.getByTestId('login-form'))
     expect(authenticationSpy.callsCount).toBe(0)
+  })
+
+  test('Shold present error if Authrentication fails', async () => {
+    const { sut, authenticationSpy } = makeSut()
+    const error = new InvalideCredentialError()
+    jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
+    simulateValidSubmit(sut)
+    const errorWrap = sut.getByTestId('error-wrap')
+    await waitFor(() => errorWrap)
+    const mainError = sut.getByTestId('main-error')
+    expect(mainError.textContent).toBe(error.message)
+    expect(errorWrap.childElementCount).toBe(1)
   })
 })
