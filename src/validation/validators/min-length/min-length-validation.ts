@@ -1,4 +1,3 @@
-import { InvalideCredentialError } from '@/domain/errors'
 import { InvalidFieldError } from '@/validation/error'
 import FieldValitation from '@/validation/protocols/field-validation'
 

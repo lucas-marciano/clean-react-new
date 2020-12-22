@@ -5,7 +5,7 @@ import faker from 'faker'
 import 'jest-localstorage-mock'
 import { cleanup, fireEvent, render, RenderResult, waitFor } from '@testing-library/react'
 import { ValidationStub, AuthenticationSpy } from '@/presentation/test'
-import { InvalideCredentialError } from '@/domain/errors'
+import { InvalidCredentialsError } from '@/domain/errors'
 import Login from './login'
 
 type SutTypes = {
@@ -167,7 +167,7 @@ describe('Login components', () => {
 
   test('Shold present error if Authrentication fails', async () => {
     const { sut, authenticationSpy } = makeSut()
-    const error = new InvalideCredentialError()
+    const error = new InvalidCredentialsError()
     jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(sut)
     testContentIsEqual(sut, 'main-error', error.message)

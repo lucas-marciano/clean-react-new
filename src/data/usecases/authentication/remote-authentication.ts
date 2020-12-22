@@ -1,5 +1,5 @@
 import { HttpPostClient, HttpStatusCode } from '@/data/protocols/http'
-import { UnexpectedError, InvalideCredentialError } from '@/domain/errors'
+import { UnexpectedError, InvalidCredentialsError } from '@/domain/errors'
 import { AccountModel } from '@/domain/models'
 import { Authentication, AuthenticationParams } from '@/domain/usecases'
 
@@ -16,7 +16,7 @@ export class RemoteAuthentication implements Authentication {
     })
     switch (httpResponse.statusCode) {
       case HttpStatusCode.ok: return httpResponse.body
-      case HttpStatusCode.unathorized: throw new InvalideCredentialError()
+      case HttpStatusCode.unauthorized: throw new InvalidCredentialsError()
       default: throw new UnexpectedError()
     }
   }
