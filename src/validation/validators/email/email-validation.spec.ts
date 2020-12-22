@@ -1,5 +1,5 @@
 import faker from 'faker'
-import EmailValidation from './email-validation'
+import { EmailValidation } from './email-validation'
 import { InvalidFieldError } from '@/validation/error'
 
 type SutTypes = {
