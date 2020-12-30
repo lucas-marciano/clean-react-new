@@ -184,6 +184,15 @@ describe('Login components', () => {
     expect(history.location.pathname).toBe('/')
   })
 
+  test('Shold present error if SaveAccessToken fails', async () => {
+    const { sut, saveAccessTokenMock } = makeSut()
+    const error = new InvalidCredentialsError()
+    jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
+    await simulateValidSubmit(sut)
+    testContentIsEqual(sut, 'main-error', error.message)
+    testErrorWrapChildCount(sut, 1)
+  })
+
   test('Shold go to signup page', async () => {
     const { sut } = makeSut()
     await simulateValidSubmit(sut)
