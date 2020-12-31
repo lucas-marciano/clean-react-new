@@ -2,6 +2,7 @@ import React from 'react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import faker from 'faker'
+import { testButtonIsDisabled, testChildCount, testStatusInput } from '@/presentation/test'
 import { cleanup, fireEvent, render, RenderResult, waitFor } from '@testing-library/react'
 import { ValidationStub, AuthenticationSpy, SaveAccessTokenMock } from '@/presentation/test'
 import { InvalidCredentialsError } from '@/domain/errors'
@@ -58,17 +59,6 @@ const simulateValidSubmit = async (sut: RenderResult, email = faker.internet.ema
   await waitFor(() => form)
 }
 
-const testStatusInput = (sut: RenderResult, id: string, messageError?: string): void => {
-  const status = sut.getByTestId(id)
-  expect(status.title).toBe(messageError || 'Tudo certo!')
-  expect(status.textContent).toBe(messageError ? '🔴' : '🔵')
-}
-
-const testErrorWrapChildCount = (sut: RenderResult, count: number): void => {
-  const errorWrap = sut.getByTestId('error-wrap')
-  expect(errorWrap.childElementCount).toBe(count)
-}
-
 const testElementExists = (sut: RenderResult, idTest: string): void => {
   const item = sut.getByTestId(idTest)
   expect(item).toBeTruthy()
@@ -77,11 +67,6 @@ const testElementExists = (sut: RenderResult, idTest: string): void => {
 const testContentIsEqual = (sut: RenderResult, fieldName: string, content: string): void => {
   const el = sut.getByTestId(fieldName)
   expect(el.textContent).toBe(content)
-}
-
-const testButtonIsDisabled = (sut: RenderResult, fieldName: string, isDisabled = true): void => {
-  const button = sut.getByTestId(fieldName) as HTMLButtonElement
-  expect(button.disabled).toBe(isDisabled)
 }
 
 describe('Login components', () => {
@@ -103,7 +88,7 @@ describe('Login components', () => {
 
   test('Shold not render the loading and error message when initialize the view', () => {
     const { sut } = makeSut()
-    testErrorWrapChildCount(sut, 0)
+    testChildCount(sut, 0, 'error-wrap')
   })
 
   test('Shold show message of error when a email input filled wrong', () => {
@@ -173,7 +158,7 @@ describe('Login components', () => {
     jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(sut)
     testContentIsEqual(sut, 'main-error', error.message)
-    testErrorWrapChildCount(sut, 1)
+    testChildCount(sut, 1, 'error-wrap')
   })
 
   test('Shold call SaveAccessToken on success', async () => {
@@ -190,7 +175,7 @@ describe('Login components', () => {
     jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(sut)
     testContentIsEqual(sut, 'main-error', error.message)
-    testErrorWrapChildCount(sut, 1)
+    testChildCount(sut, 1, 'error-wrap')
   })
 
   test('Shold go to signup page', async () => {
