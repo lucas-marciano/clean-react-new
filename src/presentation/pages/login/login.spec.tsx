@@ -2,7 +2,7 @@ import React from 'react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import faker from 'faker'
-import { testButtonIsDisabled, testChildCount, testStatusInput } from '@/presentation/test'
+import { testButtonIsDisabled, testChildCount, testStatusInput, populateField } from '@/presentation/test'
 import { cleanup, fireEvent, render, RenderResult, waitFor } from '@testing-library/react'
 import { ValidationStub, AuthenticationSpy, SaveAccessTokenMock } from '@/presentation/test'
 import { InvalidCredentialsError } from '@/domain/errors'
@@ -41,19 +41,9 @@ const makeSut = (params?: SutParam): SutTypes => {
   }
 }
 
-const populateEmailField = (sut: RenderResult, email = faker.internet.email()): void => {
-  const input = sut.getByTestId('email')
-  fireEvent.input(input, { target: { value: email } })
-}
-
-const populatePasswordField = (sut: RenderResult, password = faker.internet.password()): void => {
-  const input = sut.getByTestId('password')
-  fireEvent.input(input, { target: { value: password } })
-}
-
 const simulateValidSubmit = async (sut: RenderResult, email = faker.internet.email(), password = faker.internet.password()): Promise<void> => {
-  populateEmailField(sut, email)
-  populatePasswordField(sut, password)
+  populateField('email', sut, email)
+  populateField('password', sut, password)
   const form = sut.getByTestId('login-form')
   fireEvent.submit(form)
   await waitFor(() => form)
@@ -94,33 +84,33 @@ describe('Login components', () => {
   test('Shold show message of error when a email input filled wrong', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
-    populateEmailField(sut)
+    populateField('email', sut)
     testStatusInput(sut, 'email-status', validationError)
   })
 
   test('Shold show message of error when a password input filled wrong', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
-    populatePasswordField(sut)
+    populateField('password', sut)
     testStatusInput(sut, 'password-status', validationError)
   })
 
   test('Shold show valid email state when Validation has succeeds', () => {
     const { sut } = makeSut()
-    populateEmailField(sut)
+    populateField('email', sut)
     testStatusInput(sut, 'email-status')
   })
 
   test('Shold show valid password state when Validation has succeeds', () => {
     const { sut } = makeSut()
-    populatePasswordField(sut)
+    populateField('password', sut)
     testStatusInput(sut, 'password-status')
   })
 
   test('Shold enable submit button if form is valid', () => {
     const { sut } = makeSut()
-    populateEmailField(sut)
-    populatePasswordField(sut)
+    populateField('email', sut)
+    populateField('password', sut)
     testButtonIsDisabled(sut, 'submit', false)
   })
 
@@ -148,7 +138,7 @@ describe('Login components', () => {
   test('Shold not call Authrentication is form is invalid', () => {
     const validationError = faker.random.words()
     const { sut, authenticationSpy } = makeSut({ validationError })
-    populateEmailField(sut)
+    populateField('email', sut)
     expect(authenticationSpy.callsCount).toBe(0)
   })
 
