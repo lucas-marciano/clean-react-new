@@ -40,7 +40,7 @@ describe('SigUp Component', () => {
     Helper.testChildCount(sut, 0, 'error-wrap')
     Helper.testButtonIsDisabled(sut, 'submit')
     Helper.testStatusInput(sut, 'name-status', validationError)
-    Helper.testStatusInput(sut, 'email-status', 'Campo obrigatório')
+    Helper.testStatusInput(sut, 'email-status', validationError)
     Helper.testStatusInput(sut, 'password-status', 'Campo obrigatório')
     Helper.testStatusInput(sut, 'passwordConfirmation-status', 'Campo obrigatório')
   })
@@ -50,5 +50,12 @@ describe('SigUp Component', () => {
     const { sut } = makeSut({ validationError })
     Helper.populateField('name', sut)
     Helper.testStatusInput(sut, 'name-status', validationError)
+  })
+
+  test('Shold show message of error when a email input filled wrong', () => {
+    const validationError = faker.random.words()
+    const { sut } = makeSut({ validationError })
+    Helper.populateField('email', sut)
+    Helper.testStatusInput(sut, 'email-status', validationError)
   })
 })
