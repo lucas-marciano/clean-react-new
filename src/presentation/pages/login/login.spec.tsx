@@ -2,7 +2,7 @@ import React from 'react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import faker from 'faker'
-import { testButtonIsDisabled, testChildCount, testStatusInput, populateField } from '@/presentation/test'
+import { Helper } from '@/presentation/test'
 import { cleanup, fireEvent, render, RenderResult, waitFor } from '@testing-library/react'
 import { ValidationStub, AuthenticationSpy, SaveAccessTokenMock } from '@/presentation/test'
 import { InvalidCredentialsError } from '@/domain/errors'
@@ -42,8 +42,8 @@ const makeSut = (params?: SutParam): SutTypes => {
 }
 
 const simulateValidSubmit = async (sut: RenderResult, email = faker.internet.email(), password = faker.internet.password()): Promise<void> => {
-  populateField('email', sut, email)
-  populateField('password', sut, password)
+  Helper.populateField('email', sut, email)
+  Helper.populateField('password', sut, password)
   const form = sut.getByTestId('login-form')
   fireEvent.submit(form)
   await waitFor(() => form)
@@ -66,52 +66,52 @@ describe('Login components', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
 
-    testStatusInput(sut, 'email-status', validationError)
-    testStatusInput(sut, 'password-status', validationError)
+    Helper.testStatusInput(sut, 'email-status', validationError)
+    Helper.testStatusInput(sut, 'password-status', validationError)
   })
 
   test('Shold start with initial state of the button', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
-    testButtonIsDisabled(sut, 'submit')
+    Helper.testButtonIsDisabled(sut, 'submit')
   })
 
   test('Shold not render the loading and error message when initialize the view', () => {
     const { sut } = makeSut()
-    testChildCount(sut, 0, 'error-wrap')
+    Helper.testChildCount(sut, 0, 'error-wrap')
   })
 
   test('Shold show message of error when a email input filled wrong', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
-    populateField('email', sut)
-    testStatusInput(sut, 'email-status', validationError)
+    Helper.populateField('email', sut)
+    Helper.testStatusInput(sut, 'email-status', validationError)
   })
 
   test('Shold show message of error when a password input filled wrong', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
-    populateField('password', sut)
-    testStatusInput(sut, 'password-status', validationError)
+    Helper.populateField('password', sut)
+    Helper.testStatusInput(sut, 'password-status', validationError)
   })
 
   test('Shold show valid email state when Validation has succeeds', () => {
     const { sut } = makeSut()
-    populateField('email', sut)
-    testStatusInput(sut, 'email-status')
+    Helper.populateField('email', sut)
+    Helper.testStatusInput(sut, 'email-status')
   })
 
   test('Shold show valid password state when Validation has succeeds', () => {
     const { sut } = makeSut()
-    populateField('password', sut)
-    testStatusInput(sut, 'password-status')
+    Helper.populateField('password', sut)
+    Helper.testStatusInput(sut, 'password-status')
   })
 
   test('Shold enable submit button if form is valid', () => {
     const { sut } = makeSut()
-    populateField('email', sut)
-    populateField('password', sut)
-    testButtonIsDisabled(sut, 'submit', false)
+    Helper.populateField('email', sut)
+    Helper.populateField('password', sut)
+    Helper.testButtonIsDisabled(sut, 'submit', false)
   })
 
   test('Shold show spinner on submit', async () => {
@@ -138,7 +138,7 @@ describe('Login components', () => {
   test('Shold not call Authrentication is form is invalid', () => {
     const validationError = faker.random.words()
     const { sut, authenticationSpy } = makeSut({ validationError })
-    populateField('email', sut)
+    Helper.populateField('email', sut)
     expect(authenticationSpy.callsCount).toBe(0)
   })
 
@@ -148,7 +148,7 @@ describe('Login components', () => {
     jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(sut)
     testContentIsEqual(sut, 'main-error', error.message)
-    testChildCount(sut, 1, 'error-wrap')
+    Helper.testChildCount(sut, 1, 'error-wrap')
   })
 
   test('Shold call SaveAccessToken on success', async () => {
@@ -165,7 +165,7 @@ describe('Login components', () => {
     jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(sut)
     testContentIsEqual(sut, 'main-error', error.message)
-    testChildCount(sut, 1, 'error-wrap')
+    Helper.testChildCount(sut, 1, 'error-wrap')
   })
 
   test('Shold go to signup page', async () => {
