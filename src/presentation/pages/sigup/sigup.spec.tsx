@@ -41,7 +41,7 @@ describe('SigUp Component', () => {
     Helper.testButtonIsDisabled(sut, 'submit')
     Helper.testStatusInput(sut, 'name-status', validationError)
     Helper.testStatusInput(sut, 'email-status', validationError)
-    Helper.testStatusInput(sut, 'password-status', 'Campo obrigatório')
+    Helper.testStatusInput(sut, 'password-status', validationError)
     Helper.testStatusInput(sut, 'passwordConfirmation-status', 'Campo obrigatório')
   })
 
@@ -57,5 +57,12 @@ describe('SigUp Component', () => {
     const { sut } = makeSut({ validationError })
     Helper.populateField('email', sut)
     Helper.testStatusInput(sut, 'email-status', validationError)
+  })
+
+  test('Shold show message of error when a password input filled wrong', () => {
+    const validationError = faker.random.words()
+    const { sut } = makeSut({ validationError })
+    Helper.populateField('password', sut)
+    Helper.testStatusInput(sut, 'password-status', validationError)
   })
 })
