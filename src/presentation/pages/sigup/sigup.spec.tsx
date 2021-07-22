@@ -45,6 +45,15 @@ describe('SigUp Component', () => {
     Helper.testStatusInput(sut, 'passwordConfirmation-status', validationError)
   })
 
+  test('Shold enable submit button if form is valid', () => {
+    const { sut } = makeSut()
+    Helper.populateField('name', sut)
+    Helper.populateField('email', sut)
+    Helper.populateField('password', sut)
+    Helper.populateField('passwordConfirmation', sut)
+    Helper.testButtonIsDisabled(sut, 'submit', false)
+  })
+
   test('Shold show valid name state when Validation has succeeds', () => {
     const { sut } = makeSut()
     Helper.populateField('name', sut)
