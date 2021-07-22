@@ -42,7 +42,13 @@ describe('SigUp Component', () => {
     Helper.testStatusInput(sut, 'name-status', validationError)
     Helper.testStatusInput(sut, 'email-status', validationError)
     Helper.testStatusInput(sut, 'password-status', validationError)
-    Helper.testStatusInput(sut, 'passwordConfirmation-status', 'Campo obrigatório')
+    Helper.testStatusInput(sut, 'passwordConfirmation-status', validationError)
+  })
+
+  test('Shold show valid name state when Validation has succeeds', () => {
+    const { sut } = makeSut()
+    Helper.populateField('name', sut)
+    Helper.testStatusInput(sut, 'name-status')
   })
 
   test('Shold show message of error when a name input filled wrong', () => {
@@ -52,6 +58,12 @@ describe('SigUp Component', () => {
     Helper.testStatusInput(sut, 'name-status', validationError)
   })
 
+  test('Shold show valid email state when Validation has succeeds', () => {
+    const { sut } = makeSut()
+    Helper.populateField('email', sut)
+    Helper.testStatusInput(sut, 'email-status')
+  })
+
   test('Shold show message of error when a email input filled wrong', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
@@ -59,10 +71,29 @@ describe('SigUp Component', () => {
     Helper.testStatusInput(sut, 'email-status', validationError)
   })
 
+  test('Shold show valid password state when Validation has succeeds', () => {
+    const { sut } = makeSut()
+    Helper.populateField('password', sut)
+    Helper.testStatusInput(sut, 'password-status')
+  })
+
   test('Shold show message of error when a password input filled wrong', () => {
     const validationError = faker.random.words()
     const { sut } = makeSut({ validationError })
     Helper.populateField('password', sut)
     Helper.testStatusInput(sut, 'password-status', validationError)
+  })
+
+  test('Shold show valid passwordConfirmation state when Validation has succeeds', () => {
+    const { sut } = makeSut()
+    Helper.populateField('passwordConfirmation', sut)
+    Helper.testStatusInput(sut, 'passwordConfirmation-status')
+  })
+
+  test('Shold show message of error when a passwordConfirmation input filled wrong', () => {
+    const validationError = faker.random.words()
+    const { sut } = makeSut({ validationError })
+    Helper.populateField('passwordConfirmation', sut)
+    Helper.testStatusInput(sut, 'passwordConfirmation-status', validationError)
   })
 })
