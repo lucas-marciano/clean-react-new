@@ -49,11 +49,6 @@ const simulateValidSubmit = async (sut: RenderResult, email = faker.internet.ema
   await waitFor(() => form)
 }
 
-const testElementExists = (sut: RenderResult, idTest: string): void => {
-  const item = sut.getByTestId(idTest)
-  expect(item).toBeTruthy()
-}
-
 const testContentIsEqual = (sut: RenderResult, fieldName: string, content: string): void => {
   const el = sut.getByTestId(fieldName)
   expect(el.textContent).toBe(content)
@@ -117,7 +112,7 @@ describe('Login components', () => {
   test('Shold show spinner on submit', async () => {
     const { sut } = makeSut()
     await simulateValidSubmit(sut)
-    testElementExists(sut, 'spinner')
+    Helper.testElementExists(sut, 'spinner')
   })
 
   test('Shold call Authrentication with correct values', async () => {

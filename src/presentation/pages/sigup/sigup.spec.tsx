@@ -1,6 +1,6 @@
 import React from 'react'
 import faker from 'faker'
-import { cleanup, render, RenderResult } from '@testing-library/react'
+import { cleanup, render, RenderResult, fireEvent, waitFor } from '@testing-library/react'
 import { Helper, ValidationStub } from '@/presentation/test'
 import { createMemoryHistory } from 'history'
 import { Router } from 'react-router-dom'
@@ -29,6 +29,16 @@ const makeSut = (params?: SutParam): SutTypes => {
   return {
     sut
   }
+}
+
+const simulateValidSubmit = async (sut: RenderResult, name = faker.name.findName(), email = faker.internet.email(), password = faker.internet.password()): Promise<void> => {
+  Helper.populateField('name', sut, name)
+  Helper.populateField('email', sut, email)
+  Helper.populateField('password', sut, password)
+  Helper.populateField('passwordConfirmation', sut, password)
+  const form = sut.getByTestId('sigup-form')
+  fireEvent.submit(form)
+  await waitFor(() => form)
 }
 
 describe('SigUp Component', () => {
@@ -104,5 +114,11 @@ describe('SigUp Component', () => {
     const { sut } = makeSut({ validationError })
     Helper.populateField('passwordConfirmation', sut)
     Helper.testStatusInput(sut, 'passwordConfirmation-status', validationError)
+  })
+
+  test('Shold show spinner on submit', async () => {
+    const { sut } = makeSut()
+    await simulateValidSubmit(sut)
+    Helper.testElementExists(sut, 'spinner')
   })
 })
