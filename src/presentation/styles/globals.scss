@@ -25,4 +25,14 @@ button {
   &:hover {
     opacity: 0.9;
   }
+
+  margin-top: 32px;
+
+  &:disabled {
+    background-color: $disable;
+    color: $disableText;
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
