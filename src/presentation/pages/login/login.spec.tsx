@@ -161,7 +161,7 @@ describe('Login components', () => {
   test('Shold go to signup page', async () => {
     const { sut } = makeSut()
     await simulateValidSubmit(sut)
-    const signup = sut.getByTestId('signup')
+    const signup = sut.getByTestId('signup-link')
     fireEvent.click(signup)
     expect(history.length).toBe(2)
     expect(history.location.pathname).toBe('/signup')
