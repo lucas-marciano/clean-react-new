@@ -5,9 +5,11 @@ import { AddAccount, AddAccountParms, Authentication, AuthenticationParams } fro
 export class AddAccountSpy implements AddAccount {
   account = mockAccountModel()
   params: AddAccountParms
+  callsCount = 0
 
   async add (params: AddAccountParms): Promise<AccountModel> {
     this.params = params
+    this.callsCount++
     return this.account
   }
 }
