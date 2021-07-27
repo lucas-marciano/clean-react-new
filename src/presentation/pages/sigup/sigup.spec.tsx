@@ -1,13 +1,14 @@
 import React from 'react'
 import faker from 'faker'
 import { cleanup, render, RenderResult, fireEvent, waitFor } from '@testing-library/react'
-import { Helper, ValidationStub } from '@/presentation/test'
+import { Helper, ValidationStub, AddAccountSpy } from '@/presentation/test'
 import { createMemoryHistory } from 'history'
 import { Router } from 'react-router-dom'
 import { SigUp } from '@/presentation/pages'
 
 type SutTypes = {
   sut: RenderResult
+  addAccountSpy: AddAccountSpy
 }
 
 type SutParam = {
@@ -19,15 +20,18 @@ const history = createMemoryHistory({ initialEntries: ['/sigup'] })
 const makeSut = (params?: SutParam): SutTypes => {
   const validationStub = new ValidationStub()
   validationStub.errorMessage = params?.validationError
+  const addAccountSpy = new AddAccountSpy()
   const sut = render(
     <Router history={history}>
       <SigUp
         validation={validationStub}
+        addAccount={addAccountSpy}
       />
     </Router>
   )
   return {
-    sut
+    sut,
+    addAccountSpy
   }
 }
 
@@ -120,5 +124,19 @@ describe('SigUp Component', () => {
     const { sut } = makeSut()
     await simulateValidSubmit(sut)
     Helper.testElementExists(sut, 'spinner')
+  })
+
+  test('Shold call AddAccount with correct values', async () => {
+    const { sut, addAccountSpy } = makeSut()
+    const name = faker.name.findName()
+    const email = faker.internet.email()
+    const password = faker.internet.password()
+    await simulateValidSubmit(sut, name, email, password)
+    expect(addAccountSpy.params).toEqual({
+      name,
+      email,
+      password,
+      passwordConfirmation: password
+    })
   })
 })

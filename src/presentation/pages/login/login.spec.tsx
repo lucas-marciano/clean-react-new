@@ -137,7 +137,7 @@ describe('Login components', () => {
     expect(authenticationSpy.callsCount).toBe(0)
   })
 
-  test('Shold present error if Authrentication fails', async () => {
+  test('Shold present error if Authentication fails', async () => {
     const { sut, authenticationSpy } = makeSut()
     const error = new InvalidCredentialsError()
     jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
