@@ -80,7 +80,7 @@ const SigUp: React.FC<Props> = ({ validation, addAccount, saveAccessToken }: Pro
             !!state.passwordConfirmationError ||
             !!state.passwordError
           } className={Styles.submit} type="submit">Criar</button>
-          <Link to="/login" className={Styles.link}>Voltar para o Login</Link>
+          <Link data-testid="login-link" replace to="/login" className={Styles.link}>Voltar para o Login</Link>
           <FormStatus />
         </form>
       </Context.Provider>
