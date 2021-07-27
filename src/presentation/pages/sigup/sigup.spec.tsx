@@ -5,6 +5,7 @@ import { Helper, ValidationStub, AddAccountSpy } from '@/presentation/test'
 import { createMemoryHistory } from 'history'
 import { Router } from 'react-router-dom'
 import { SigUp } from '@/presentation/pages'
+import { EmailInUseError } from '@/domain/errors'
 
 type SutTypes = {
   sut: RenderResult
@@ -152,5 +153,14 @@ describe('SigUp Component', () => {
     const { sut, addAccountSpy } = makeSut({ validationError })
     Helper.populateField('email', sut)
     expect(addAccountSpy.callsCount).toBe(0)
+  })
+
+  test('Shold present error if AddAccount fails', async () => {
+    const { sut, addAccountSpy } = makeSut()
+    const error = new EmailInUseError()
+    jest.spyOn(addAccountSpy, 'add').mockRejectedValueOnce(error)
+    await simulateValidSubmit(sut)
+    Helper.testContentIsEqual(sut, 'main-error', error.message)
+    Helper.testChildCount(sut, 1, 'error-wrap')
   })
 })

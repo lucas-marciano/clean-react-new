@@ -49,11 +49,6 @@ const simulateValidSubmit = async (sut: RenderResult, email = faker.internet.ema
   await waitFor(() => form)
 }
 
-const testContentIsEqual = (sut: RenderResult, fieldName: string, content: string): void => {
-  const el = sut.getByTestId(fieldName)
-  expect(el.textContent).toBe(content)
-}
-
 describe('Login components', () => {
   afterEach(cleanup)
 
@@ -140,9 +135,9 @@ describe('Login components', () => {
   test('Shold present error if Authentication fails', async () => {
     const { sut, authenticationSpy } = makeSut()
     const error = new InvalidCredentialsError()
-    jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
+    jest.spyOn(authenticationSpy, 'auth').mockRejectedValueOnce(error)
     await simulateValidSubmit(sut)
-    testContentIsEqual(sut, 'main-error', error.message)
+    Helper.testContentIsEqual(sut, 'main-error', error.message)
     Helper.testChildCount(sut, 1, 'error-wrap')
   })
 
@@ -159,7 +154,7 @@ describe('Login components', () => {
     const error = new InvalidCredentialsError()
     jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(sut)
-    testContentIsEqual(sut, 'main-error', error.message)
+    Helper.testContentIsEqual(sut, 'main-error', error.message)
     Helper.testChildCount(sut, 1, 'error-wrap')
   })
 
