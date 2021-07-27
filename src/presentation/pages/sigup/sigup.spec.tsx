@@ -5,7 +5,7 @@ import { Helper, ValidationStub, AddAccountSpy, SaveAccessTokenMock } from '@/pr
 import { createMemoryHistory } from 'history'
 import { Router } from 'react-router-dom'
 import { SigUp } from '@/presentation/pages'
-import { EmailInUseError } from '@/domain/errors'
+import { EmailInUseError, InvalidCredentialsError } from '@/domain/errors'
 
 type SutTypes = {
   sut: RenderResult
@@ -174,5 +174,14 @@ describe('SigUp Component', () => {
     expect(saveAccessTokenMock.accessToken).toBe(addAccountSpy.account.accessToken)
     expect(history.length).toBe(1)
     expect(history.location.pathname).toBe('/')
+  })
+
+  test('Shold present error if SaveAccessToken fails', async () => {
+    const { sut, saveAccessTokenMock } = makeSut()
+    const error = new InvalidCredentialsError()
+    jest.spyOn(saveAccessTokenMock, 'save').mockRejectedValueOnce(error)
+    await simulateValidSubmit(sut)
+    Helper.testContentIsEqual(sut, 'main-error', error.message)
+    Helper.testChildCount(sut, 1, 'error-wrap')
   })
 })
