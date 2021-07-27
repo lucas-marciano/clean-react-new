@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useHistory } from 'react-router-dom'
-import Styles from './sigup-styles.scss'
+import Styles from './signup-styles.scss'
 import { Footer, FormStatus, Input, LoginHeader, SubmitButton } from '@/presentation/components/'
 import Context from '@/presentation/contexts/form/form-context'
 import { Validation } from '@/presentation/protocols/validation'
@@ -12,7 +12,7 @@ type Props = {
   saveAccessToken: SaveAccessToken
 }
 
-const SigUp: React.FC<Props> = ({ validation, addAccount, saveAccessToken }: Props) => {
+const SignUp: React.FC<Props> = ({ validation, addAccount, saveAccessToken }: Props) => {
   const history = useHistory()
   const [state, setState] = useState({
     isLoading: false,
@@ -70,10 +70,10 @@ const SigUp: React.FC<Props> = ({ validation, addAccount, saveAccessToken }: Pro
   }, [state.name, state.email, state.password, state.passwordConfirmation])
 
   return (
-    <div className={Styles.sigup}>
+    <div className={Styles.signup}>
       <LoginHeader />
       <Context.Provider value={{ state, setState }}>
-        <form data-testid="sigup-form" className={Styles.form} onSubmit={hanldeSubmit}>
+        <form data-testid="signup-form" className={Styles.form} onSubmit={hanldeSubmit}>
           <h2>Cadastre sua conta</h2>
           <Input type="text" name="name" placeholder="Digite seu nome" />
           <Input type="email" name="email" placeholder="Digite seu e-mail" />
@@ -89,4 +89,4 @@ const SigUp: React.FC<Props> = ({ validation, addAccount, saveAccessToken }: Pro
   )
 }
 
-export default SigUp
+export default SignUp
