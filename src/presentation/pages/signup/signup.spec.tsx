@@ -4,7 +4,7 @@ import { cleanup, render, RenderResult, fireEvent, waitFor } from '@testing-libr
 import { Helper, ValidationStub, AddAccountSpy, SaveAccessTokenMock } from '@/presentation/test'
 import { createMemoryHistory } from 'history'
 import { Router } from 'react-router-dom'
-import { SigUp } from '@/presentation/pages'
+import { SignUp } from '@/presentation/pages'
 import { EmailInUseError, InvalidCredentialsError } from '@/domain/errors'
 
 type SutTypes = {
@@ -26,7 +26,7 @@ const makeSut = (params?: SutParam): SutTypes => {
   validationStub.errorMessage = params?.validationError
   const sut = render(
     <Router history={history}>
-      <SigUp
+      <SignUp
         validation={validationStub}
         addAccount={addAccountSpy}
         saveAccessToken={saveAccessTokenMock}
@@ -45,12 +45,12 @@ const simulateValidSubmit = async (sut: RenderResult, name = faker.name.findName
   Helper.populateField('email', sut, email)
   Helper.populateField('password', sut, password)
   Helper.populateField('passwordConfirmation', sut, password)
-  const form = sut.getByTestId('sigup-form')
+  const form = sut.getByTestId('signup-form')
   fireEvent.submit(form)
   await waitFor(() => form)
 }
 
-describe('SigUp Component', () => {
+describe('SignUp Component', () => {
   afterEach(cleanup)
 
   test('Shold start with initial state of the inputs', () => {
