@@ -146,4 +146,11 @@ describe('SigUp Component', () => {
     await simulateValidSubmit(sut)
     expect(addAccountSpy.callsCount).toBe(1)
   })
+
+  test('Shold not call AddAccount is form is invalid', () => {
+    const validationError = faker.random.words()
+    const { sut, addAccountSpy } = makeSut({ validationError })
+    Helper.populateField('email', sut)
+    expect(addAccountSpy.callsCount).toBe(0)
+  })
 })
