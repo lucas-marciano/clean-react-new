@@ -184,4 +184,13 @@ describe('SigUp Component', () => {
     Helper.testContentIsEqual(sut, 'main-error', error.message)
     Helper.testChildCount(sut, 1, 'error-wrap')
   })
+
+  test('Shold go to login page', async () => {
+    const { sut } = makeSut()
+    await simulateValidSubmit(sut)
+    const loginLink = sut.getByTestId('login-link')
+    fireEvent.click(loginLink)
+    expect(history.length).toBe(1)
+    expect(history.location.pathname).toBe('/login')
+  })
 })
