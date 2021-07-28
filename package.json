@@ -9,6 +9,7 @@
     "test:watch": "npm test -- --watch",
     "test:staged": "npm test -- --findRelatedTests",
     "test:ci": "npm test -- --coverage",
+    "test:cypress": "cypress open",
     "test:coveralls": "npm run test:ci && coveralls < coverage/lcov.info",
     "check": "npm-check -s -u"
   },
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.3.1",
+    "@cypress/webpack-preprocessor": "^5.9.1",
     "@testing-library/react": "^11.2.2",
     "@types/axios": "^0.14.0",
     "@types/faker": "^5.1.5",
@@ -32,9 +34,10 @@
     "clean-webpack-plugin": "^3.0.0",
     "coveralls": "^3.1.0",
     "css-loader": "^5.0.1",
+    "cypress": "^8.0.0",
     "eslint": "^7.15.0",
     "eslint-config-standard-with-typescript": "^19.0.1",
-    "eslint-plugin-cypress": "^2.11.2",
+    "eslint-plugin-cypress": "^2.11.3",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
