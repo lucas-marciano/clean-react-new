@@ -1,6 +1,6 @@
 export class InvalidFieldError extends Error {
   constructor () {
-    super('O campo incorreto')
+    super('Valor inválido')
     this.name = 'InvalidFieldError'
   }
 }
