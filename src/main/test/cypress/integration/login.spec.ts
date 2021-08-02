@@ -46,7 +46,7 @@ describe('Login', () => {
     cy.getByTestId('error-wrap').should('not.have.descendants')
   })
 
-  it('Should present invalid state if credencial do not exist', () => {
+  it('Should present invalid state if credential do not exist', () => {
     cy.getByTestId('email').focus().type(faker.internet.email())
     cy.getByTestId('password').focus().type(faker.random.alphaNumeric(8))
     cy.getByTestId('submit').click()
@@ -56,5 +56,17 @@ describe('Login', () => {
       .getByTestId('spinner').should('not.exist')
       .getByTestId('main-error').should('contain.text', 'Credenciais inválidas')
     cy.url().should('eq', `${baseUrl}/login`)
+  })
+
+  it('Should save accessToken if credentials is valid', () => {
+    cy.getByTestId('email').focus().type('mango@gmail.com')
+    cy.getByTestId('password').focus().type('12345')
+    cy.getByTestId('submit').click()
+    cy.getByTestId('error-wrap')
+      .getByTestId('spinner').should('exist')
+      .getByTestId('main-error').should('not.exist')
+      .getByTestId('spinner').should('not.exist')
+    cy.url().should('eq', `${baseUrl}/`)
+    cy.window().then(window => assert.isOk(window.localStorage.getItem('accessToken')))
   })
 })
